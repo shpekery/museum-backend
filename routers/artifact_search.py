@@ -57,15 +57,13 @@ def generate_test_search_history():
                          " В дальнейшем по айди можно запросить результаты поиска.")
 async def upload_artifact_search(
         file: UploadFile, db: Session = Depends(get_db),
-        is_search: Union[bool, None] = False,
-        is_categorize: Union[bool, None] = False,
+        is_search_and_categorize: Union[bool, None] = False,
         is_generate_description: Union[bool, None] = False,
 
 ) -> int:
     photo_content = await file.read()
     artifact_search = create_artifact_search(db, ArtifactSearchCreate(photo=photo_content,
-                                                                      is_search=is_search,
-                                                                      is_categorize=is_categorize,
+                                                                      is_search=is_search_and_categorize,
                                                                       is_generate_description=is_generate_description))
     return artifact_search.id
 
@@ -83,8 +81,7 @@ def get_search_history(db: Session = Depends(get_db)) -> List[ArtifactSearchHist
 def get_artifact_search_info(artifact_search_id: int,
                              db: Session = Depends(get_db)) -> ArtifactSearch:
     artifact_search = get_artifact_search_by_id(db, artifact_search_id)
-    is_search = artifact_search.is_search
-    is_categorize = artifact_search.is_categorize
+    is_search_and_categorize = artifact_search.is_search_and_categorize
     is_generate_description = artifact_search.is_generate_description
 
     response = ArtifactSearch(photo=blob_to_base64(artifact_search.photo), id=artifact_search.id)
@@ -92,11 +89,11 @@ def get_artifact_search_info(artifact_search_id: int,
     description = "Красивый меч цвета BMW M8 Competition"
     categories = ["Оружие"]
 
-    if is_search:
+    if is_search_and_categorize:
         response.search_results = search_results
+        response.categories = categories
     if is_generate_description:
         response.description = description
-    if is_categorize:
-        response.categories = categories
+
 
     return response
