@@ -24,7 +24,7 @@ def get_file_base64(file_path):
 
 
 def blob_to_base64(blob):
-    return base64.b64encode(blob).decode('utf-8')
+    return "data:image/png;base64," + base64.b64encode(blob).decode('utf-8')
 
 
 def generate_test_search_results():
