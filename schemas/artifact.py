@@ -17,6 +17,9 @@ class Artifact(ArtifactBase):
 
 class ArtifactSearchCreate(BaseModel):
     photo: bytes
+    is_search: bool
+    is_categorize: bool
+    is_generate_description: bool
 
 
 class ArtifactSearch(Artifact):

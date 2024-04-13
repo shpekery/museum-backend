@@ -11,3 +11,6 @@ class ArtifactSearch(Base):
     id = Column(Integer, primary_key=True)
     time_created = Column(DateTime(timezone=True), server_default=func.now())
     photo = Column(BLOB)
+    is_search = Column(Boolean, default=True)
+    is_categorize = Column(Boolean, default=False)
+    is_generate_description = Column(Boolean, default=False)

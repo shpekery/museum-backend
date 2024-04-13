@@ -56,10 +56,17 @@ def generate_test_search_history():
              description="Фото загружается на сервер, получает свой айди, который возвращается."
                          " В дальнейшем по айди можно запросить результаты поиска.")
 async def upload_artifact_search(
-        file: UploadFile, db: Session = Depends(get_db)
+        file: UploadFile, db: Session = Depends(get_db),
+        is_search: Union[bool, None] = False,
+        is_categorize: Union[bool, None] = False,
+        is_generate_description: Union[bool, None] = False,
+
 ) -> int:
     photo_content = await file.read()
-    artifact_search = create_artifact_search(db, ArtifactSearchCreate(photo=photo_content))
+    artifact_search = create_artifact_search(db, ArtifactSearchCreate(photo=photo_content,
+                                                                      is_search=is_search,
+                                                                      is_categorize=is_categorize,
+                                                                      is_generate_description=is_generate_description))
     return artifact_search.id
 
 
@@ -74,12 +81,11 @@ def get_search_history(db: Session = Depends(get_db)) -> List[ArtifactSearchHist
 
 @router.get("/{artifact_search_id}")
 def get_artifact_search_info(artifact_search_id: int,
-                             is_search: Union[bool, None] = False,
-                             is_categorize: Union[bool, None] = False,
-                             is_generate_description: Union[bool, None] = False,
                              db: Session = Depends(get_db)) -> ArtifactSearch:
     artifact_search = get_artifact_search_by_id(db, artifact_search_id)
-    print(artifact_search)
+    is_search = artifact_search.is_search
+    is_categorize = artifact_search.is_categorize
+    is_generate_description = artifact_search.is_generate_description
 
     response = ArtifactSearch(photo=blob_to_base64(artifact_search.photo), id=artifact_search.id)
     search_results = generate_test_search_results()
