@@ -6,17 +6,15 @@ import os
 from fastapi import APIRouter, UploadFile, Depends
 from sqlalchemy.orm import Session
 
-from schemas.artifact import Artifact, ArtifactSearchHistory, ArtifactSearchCreate, ArtifactSearch
+from schemas.artifact import Artifact, ArtifactSearchHistory, ArtifactSearchCreate, ArtifactSearch, Category
 from db.methods import get_artifacts_search, create_artifact_search, get_artifact_search_by_id
 from db.core import get_db
+
+from utils import ml_api
 
 from typing import List, Union
 
 router = APIRouter(prefix='/search_artifact')
-
-# TODO в конфиг вынести
-test_file_name = 'test_response.jpg'
-
 
 def get_file_base64(file_path):
     with open(file_path, 'rb') as f:
@@ -25,30 +23,6 @@ def get_file_base64(file_path):
 
 def blob_to_base64(blob):
     return "data:image/png;base64," + base64.b64encode(blob).decode('utf-8')
-
-
-def generate_test_search_results():
-    search_results = []
-    test_file_base64 = get_file_base64(test_file_name)
-    for i in range(10):
-        search_results.append(Artifact(
-            id=random.randint(1, 1000),
-            description="Шашка драгунская офицерская обр. 1881 г.",
-            photo=test_file_base64
-        ))
-
-    return search_results
-
-
-def generate_test_search_history():
-    search_history = []
-    for i in range(5):
-        search_history.append(ArtifactSearchHistory(
-            timestamp=time.time() - 86400 * i,
-            photo=get_file_base64(test_file_name),
-            results=generate_test_search_results()
-        ))
-    return search_history
 
 
 @router.post("",
@@ -63,7 +37,7 @@ async def upload_artifact_search(
 ) -> int:
     photo_content = await file.read()
     artifact_search = create_artifact_search(db, ArtifactSearchCreate(photo=photo_content,
-                                                                      is_search=is_search_and_categorize,
+                                                                      is_search_and_categorize=is_search_and_categorize,
                                                                       is_generate_description=is_generate_description))
     return artifact_search.id
 
@@ -85,15 +59,37 @@ def get_artifact_search_info(artifact_search_id: int,
     is_generate_description = artifact_search.is_generate_description
 
     response = ArtifactSearch(photo=blob_to_base64(artifact_search.photo), id=artifact_search.id)
-    search_results = generate_test_search_results()
+
+    data = ml_api.search_and_get_category_by_image(artifact_search.photo)
+    categories = []
+    search_results = []
+
+    for category in data['class']:
+        categories.append(Category(name=category[0], accuracy=category[1]))
+
+    for result in data['similar_images']:
+        photo_name = result[0]
+        title = result[1]
+        description = result[2]
+        category = Category(name=result[3], accuracy=1)
+        accuracy = float(result[4])
+
+        photo_data = ml_api.get_photo_by_name(photo_name)
+        search_results.append(Artifact(
+            id=int(photo_name.split('.')[0]),
+            description=description,
+            title=title,
+            categories=[category],
+            photo=blob_to_base64(photo_data),
+            accuracy=accuracy
+        ))
+
     description = "Красивый меч цвета BMW M8 Competition"
-    categories = ["Оружие"]
 
     if is_search_and_categorize:
         response.search_results = search_results
         response.categories = categories
     if is_generate_description:
         response.description = description
-
 
     return response
