@@ -94,9 +94,9 @@ def get_artifact_search_info(artifact_search_id: int,
 
     if is_search:
         response.search_results = search_results
-    if is_categorize:
-        response.description = description
     if is_generate_description:
+        response.description = description
+    if is_categorize:
         response.categories = categories
 
     return response
