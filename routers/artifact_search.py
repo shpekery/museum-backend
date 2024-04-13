@@ -72,7 +72,7 @@ def get_search_history(db: Session = Depends(get_db)) -> List[ArtifactSearchHist
     return response
 
 
-@router.get("/{artifact_id}")
+@router.get("/{artifact_search_id}")
 def get_artifact_search_info(artifact_search_id: int,
                              is_search: Union[bool, None] = False,
                              is_categorize: Union[bool, None] = False,
