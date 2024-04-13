@@ -7,7 +7,7 @@ ML_URI_API = ""
 test_file_name = 'test_response.jpg'
 
 
-def search_and_get_category_by_image(binary_image):
+def search_and_get_category_by_image(binary_image, description=False):
     if ML_URI_API:
         files = {'file': binary_image}
         return requests.post(ML_URI_API + '/predict', files=files).json()

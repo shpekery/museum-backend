@@ -26,6 +26,7 @@ class ArtifactSearchCreate(BaseModel):
     photo: bytes
     is_search_and_categorize: bool
     is_generate_description: bool
+    user_session: str
 
 
 class ArtifactSearch(Artifact):

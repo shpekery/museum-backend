@@ -10,7 +10,7 @@ from routers import artifact_search
 
 models.Base.metadata.create_all(bind=database.engine)
 
-app = FastAPI()
+app = FastAPI(title="Пыоиска по фото среди музейных экспонатов")
 
 origins = [
     "*",
