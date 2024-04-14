@@ -8,8 +8,6 @@ TEST_PHOTO_NAME = os.getenv("TEST_PHOTO_NAME")
 if TEST_PHOTO_NAME is None:
     TEST_PHOTO_NAME = 'test_response.jpg'
 
-print(ML_URI_API, TEST_PHOTO_NAME)
-
 
 def search_and_get_category_by_image(binary_image, description=False):
     if ML_URI_API:

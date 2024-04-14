@@ -92,6 +92,8 @@ async def get_artifact_search_info(artifact_search_id: int,
         response.categories = categories
     if is_generate_description:
         description_data: dict = data.get('description', {})
-        response.description = [description_data.get('caption_1', ''), description_data.get('caption_2', '')]
+        response.description = [description_data.get('caption_1', '').capitalize(),
+                                description_data.get('caption_2', '').capitalize()]
+        print(response.description)
 
     return response
