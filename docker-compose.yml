@@ -8,4 +8,22 @@ services:
       - "8000:8000"
     restart: always
     environment:
-      - ML_API_URI=""
+      ML_API_URI: https://0880-217-197-8-73.ngrok-free.app
+      TEST_PHOTO_NAME: test_response.jpg
+      DATABASE_URL: postgresql://user:password@db:5432/database
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+
+volumes:
+  postgres_data:

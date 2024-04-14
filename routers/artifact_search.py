@@ -56,23 +56,23 @@ def get_search_history(user_session: str,
 
 @router.get("/{artifact_search_id}")
 async def get_artifact_search_info(artifact_search_id: int,
-                             db: Session = Depends(get_db)) -> ArtifactSearch:
+                                   db: Session = Depends(get_db)) -> ArtifactSearch:
     artifact_search = get_artifact_search_by_id(db, artifact_search_id)
     is_search_and_categorize = artifact_search.is_search_and_categorize
     is_generate_description = artifact_search.is_generate_description
 
     response = ArtifactSearch(photo=blob_to_base64(artifact_search.photo), id=artifact_search.id)
 
-    data = ml_api.search_and_get_category_by_image(artifact_search.photo)
+    data = ml_api.search_and_get_category_by_image(artifact_search.photo, description=is_generate_description)
 
     if is_search_and_categorize:
         categories = []
         search_results = []
 
-        for category in data['class']:
+        for category in data.get('class', []):
             categories.append(Category(name=category[0], accuracy=category[1]))
 
-        for result in data['similar_images']:
+        for result in data.get('similar_images', []):
             photo_name = result[0]
             title = result[1]
             description = result[2]
@@ -91,6 +91,7 @@ async def get_artifact_search_info(artifact_search_id: int,
         response.search_results = search_results
         response.categories = categories
     if is_generate_description:
-        response.description = description
+        description_data: dict = data.get('description', {})
+        response.description = [description_data.get('caption_1', ''), description_data.get('caption_2', '')]
 
     return response

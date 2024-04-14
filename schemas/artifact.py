@@ -30,6 +30,7 @@ class ArtifactSearchCreate(BaseModel):
 
 
 class ArtifactSearch(Artifact):
+    description: List[str] = []
     search_results: List[Artifact] = []
 
 
