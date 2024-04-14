@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     restart: always
     environment:
-      ML_API_URI: https://0880-217-197-8-73.ngrok-free.app
+      ML_URI_API: https://8ac1-217-197-8-73.ngrok-free.app
       TEST_PHOTO_NAME: test_response.jpg
       DATABASE_URL: postgresql://user:password@db:5432/database
     depends_on:

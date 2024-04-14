@@ -51,7 +51,7 @@ def get_search_history(user_session: str,
     for artifact_search in get_artifacts_search(db, user_session, limit=10):
         artifact_search.photo = blob_to_base64(artifact_search.photo)
         response.append(ArtifactSearchHistory.from_orm(artifact_search))
-    return response[::-1]
+    return response
 
 
 @router.get("/{artifact_search_id}")

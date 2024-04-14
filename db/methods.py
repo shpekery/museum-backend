@@ -6,7 +6,8 @@ from typing import List
 
 
 def get_artifacts_search(db: Session, user_session, skip: int = 0, limit: int = 100) -> List[models.ArtifactSearch]:
-    return db.query(models.ArtifactSearch).filter(models.ArtifactSearch.user_session == user_session).offset(
+    return db.query(models.ArtifactSearch).filter(models.ArtifactSearch.user_session == user_session).order_by(
+        models.ArtifactSearch.id.desc()).offset(
         skip).limit(limit).all()
 
 

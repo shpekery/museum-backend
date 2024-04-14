@@ -2,6 +2,7 @@ import requests
 import os
 
 ML_URI_API = os.getenv("ML_URI_API")
+print("ML_URI_API:", ML_URI_API)
 if ML_URI_API is None:
     ML_URI_API = "https://0880-217-197-8-73.ngrok-free.app"
 TEST_PHOTO_NAME = os.getenv("TEST_PHOTO_NAME")
@@ -12,6 +13,7 @@ if TEST_PHOTO_NAME is None:
 def search_and_get_category_by_image(binary_image, description=False):
     if ML_URI_API:
         files = {'file': binary_image}
+        print(ML_URI_API + f'/predict?description={description}')
         return requests.post(ML_URI_API + f'/predict?description={description}', files=files).json()
     else:
         description_dict = {}
